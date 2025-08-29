@@ -1,10 +1,14 @@
+from __future__ import annotations
+
 import os
+from typing import Literal, Optional
+
 import pandas as pd
 from PIL import Image
-from typing import Optional, List
-from skin3d.annotate import (
-    lesion_properties_from_annotations,
-)
+
+from skin3d.annotate import lesion_properties_from_annotations
+
+PartitionType = Literal["train", "valid", "test", "long"]
 
 
 class BodyTexDataset:
@@ -32,7 +36,7 @@ class BodyTexDataset:
         self.dir_multi_annotate = dir_multi_annotate
         self.dir_textures = dir_textures
 
-    def annotated_scan_ids(self, partition: str) -> List[str]:
+    def annotated_scan_ids(self, partition: PartitionType) -> list[str]:
         """Return the annotated scan IDs of the given `partition`."""
         return list(self.annotated_samples_in_partition(partition).scan_id.values)
 
@@ -40,8 +44,7 @@ class BodyTexDataset:
         """Return the row corresponding to the `scan_id`.
 
         Raises:
-            ValueError: Raises if multiple records correspond
-                to the `scan_id`.
+            ValueError: Raises if multiple records correspond to the `scan_id`.
         """
         scan_row = self.df[self.df.scan_id == scan_id]
         if len(scan_row) > 1:
@@ -80,7 +83,7 @@ class BodyTexDataset:
 
     def annotation_filepath(
         self,
-        scan_id: int,
+        scan_id: str,
         annotator: Optional[str] = None,
     ) -> str:
         """Return the path to the annotation CSV."""
@@ -120,7 +123,7 @@ class BodyTexDataset:
 
     def annotations(
         self,
-        scan_ids: List[str],
+        scan_ids: list[str],
         annotator: Optional[str] = None,
     ) -> pd.DataFrame:
         """Return a dataframe of all annotations for the given `scan_ids`."""
@@ -131,20 +134,20 @@ class BodyTexDataset:
 
         return pd.concat(all_ann_dfs)
 
-    def texture_image(self, scan_id: str) -> Image:
+    def texture_image(self, scan_id: str) -> Image.Image:
         """Return the texture image corresponding to `scan_id`."""
         img_path = self.texture_filepath(scan_id=scan_id)
         img = Image.open(img_path).convert("RGB")
         return img
 
-    def annotation_ids_in_partition(self, partition: str) -> List[str]:
+    def annotation_ids_in_partition(self, partition: PartitionType) -> list[str]:
         partition_ids = self.annotated_samples_in_partition(
             partition=partition
         ).scan_id.values
 
         return list(partition_ids)
 
-    def annotated_samples_in_partition(self, partition: str) -> pd.DataFrame:
+    def annotated_samples_in_partition(self, partition: PartitionType) -> pd.DataFrame:
         """Return the selected annotated samples belonging to the `partition`.
 
         We select a subset of the rows (i.e., scans) to annotate
@@ -158,9 +161,9 @@ class BodyTexDataset:
             DataFrame: The rows assigned to the partition
                 that were selected to be studied in the experiment.
         """
-        is_partition = (self.df.partition == partition).values
-        is_selected = self.df.selected.values
-        return self.df[is_partition & is_selected]
+        is_partition = self.df.partition == partition
+        is_selected = self.df.selected
+        return self.df.loc[is_partition & is_selected]
 
     def summary(self):
         """Print summary statistics of the annotations."""
@@ -179,7 +182,7 @@ class BodyTexDataset:
         a3 = self.annotations(test_ids, annotator="A3")
 
         # Combine all annotations into a single data-frame to compute stats.
-        annotations = annotations_single.append([a1, a2, a3])
+        annotations = pd.concat([annotations_single, a1, a2, a3])
 
         print("Number of scans annotated with lesions: {}".format(len(scan_ids)))
         print("Number of annotated training scans: {}".format(len(train_ids)))
