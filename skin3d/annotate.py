@@ -1,8 +1,10 @@
 from __future__ import annotations
-import os
+
 import json
-import pandas as pd
+import os
 from typing import Optional
+
+import pandas as pd
 
 
 def lesion_properties_from_annotations(
@@ -29,7 +31,7 @@ def lesion_properties_from_annotations(
         region_attributes = json.loads(region_attributes)
         # If the lesion_id field exists and is set,
         # then set the lesion_id.
-        lesion_id = ""
+        lesion_id: str | int = ""
         if "lesion_id" in region_attributes and region_attributes["lesion_id"] != "":
             lesion_id = int(region_attributes["lesion_id"])
 
@@ -54,14 +56,15 @@ def lesion_properties_from_annotations(
     return properties
 
 
-def load_multiple_annotations(dir_multi_annotate: str) -> dict[dict[pd.DataFrame]]:
+def load_multiple_annotations(
+    dir_multi_annotate: str,
+) -> dict[str, dict[str, pd.DataFrame]]:
     """Returns a dictionary of annotations for multiple readers.
 
     The returned dictionary contains a dictionary of dataframes.
     annotations.keys() -> list of annotaor IDs e.g., ['A1', 'A2']
     annotations['A1'].keys() -> list of scan IDs e.g., ['000', '009']
-    annotations['A1']['000'] -> dataframe of annotations
-                                done by 'A1' for scan '000'
+    annotations['A1']['000'] -> dataframe of annotations done by 'A1' for scan '000'
     """
 
     annotators = sorted(os.listdir(dir_multi_annotate))

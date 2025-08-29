@@ -12,12 +12,8 @@ def embed_box_borders(img, x, y, w, h, color, pad):
 
 
 def embed_annotatations(
-    img: np.array, annotations: pd.DataFrame, color: tuple, pad: int
-):
-    """Embed the annotations in the image.
-
-    Note that `img` is a mutable object and will be changed
-    (which is why nothing is returned).
-    """
+    img: np.ndarray, annotations: pd.DataFrame, color: tuple, pad: int
+) -> None:
+    """Embed the annotations in the pixels of the image."""
     for _, row in annotations.iterrows():
         embed_box_borders(img, row.x, row.y, row.width, row.height, color, pad)
