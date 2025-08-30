@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 import numpy as np
 import pandas as pd
 
 
-def embed_box_borders(img, x, y, w, h, color, pad):
+def embed_box_borders(img, x, y, w, h, color: tuple[int, int, int], pad: int):
     p = pad
 
     img[y : y + h, x - p : x, :] = color
@@ -12,7 +14,7 @@ def embed_box_borders(img, x, y, w, h, color, pad):
 
 
 def embed_annotatations(
-    img: np.ndarray, annotations: pd.DataFrame, color: tuple, pad: int
+    img: np.ndarray, annotations: pd.DataFrame, color: tuple[int, int, int], pad: int
 ) -> None:
     """Embed the annotations in the pixels of the image."""
     for _, row in annotations.iterrows():
