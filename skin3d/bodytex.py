@@ -104,14 +104,11 @@ class BodyTexDataset:
     ) -> pd.DataFrame:
         """Return a dataframe for the annotations of `scan_id`.
 
-        If `annotator` is None, then return
-            the annotations in `self.dir_annotate`.
-        If `annotator` is not None, then return
-            the annotations for `scan_id` for the given `annotator`.
-            Specifically, this gets the annotations
-            in `self.dir_multi_annotate/` + `annotator`,
-            which corresponds to the test set annotations
-            done by `annotator`.
+        If `annotator` is None, return the annotations in `self.dir_annotate`.
+
+        If `annotator` is not None, return the multi-annotations for the `annotator`.
+            Specifically, this gets annotations in `self.dir_multi_annotate/annotator`,
+            which are the multiple test set annotations done by `annotator`.
         """
 
         annotated_df = pd.read_csv(
